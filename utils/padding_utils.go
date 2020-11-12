@@ -12,6 +12,14 @@ func PKCS5EndPadding(text []byte, size int) []byte {
 }
 
 /**
+ *该函数用于对解密后的数据进行尾部去除
+ */
+func ClearPKCS5Padding(text []byte, size int) []byte {
+	lastEle := int(text[len(text) - 1])//最后一个元素
+	return  text[0: len(text) - lastEle]
+}
+
+/**
  *该函数用于将明文进行尾部填充，采用Zeros方式
  */
 func ZerosEndPadding(text []byte, size int) []byte {

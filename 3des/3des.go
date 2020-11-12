@@ -9,7 +9,7 @@ import (
 /**
  *该函数用于实线3des算法的加密
  */
-func TripleDesEncrypt(origintext []byte, key []byte) ([]byte, error) {
+func TripleDESEncrypt(origintext []byte, key []byte) ([]byte, error) {
 	//三要素：key，data，mode
 	//1,实例化一个cipher
 	block, err := des.NewTripleDESCipher(key)
@@ -21,7 +21,7 @@ func TripleDesEncrypt(origintext []byte, key []byte) ([]byte, error) {
 	cryptData := utils.ZerosEndPadding(origintext, block.BlockSize())
 
 	//3,实例化加密模式mode
-	mode := cipher.NewCBCEncrypter(block, key)
+	mode := cipher.NewCBCEncrypter(block, key[:block.BlockSize()])
 
 	//4,对填充后的明文进行分组加密
 	cipherText := make([]byte, len(cryptData))
@@ -39,9 +39,11 @@ func TripleDESDecrypt(ciphertext []byte, key []byte) ([]byte, error) {
 		return nil ,err
 	}
 	//2,不需要对密文进行尾部填充，可以直接使用，实例化mode
-	blockMode := cipher.NewCBCDecrypter(block, key)
+	blockMode := cipher.NewCBCDecrypter(block, key[:block.BlockSize()])
 	originText := make([]byte, len(ciphertext))
 	blockMode.CryptBlocks(originText, ciphertext)
+	//清除尾部填充
+	utils.ClearPKCS5Padding(originText, block.BlockSize())
 	return originText, nil
 }
 
