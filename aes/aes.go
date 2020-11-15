@@ -28,14 +28,15 @@ func AESEnCrypt(origin []byte, key []byte) ([]byte, error) {
 /**
  *使用AES算法对密文进行解密
  */
-func AESDeCrypt(cipherText []byte, key []byte) ([]byte, error) {
+func AESDeCrypt(data, key []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		return nil ,err
+		return nil, err
 	}
 	blockMode := cipher.NewCBCDecrypter(block, key[:block.BlockSize()])
-	originText := make([]byte, len(cipherText))
-	blockMode.CryptBlocks(originText,cipherText)
-	utils.ClearPKCS5Padding(originText, block.BlockSize())
-	return originText, nil
+	originalText := make([]byte, len(data))
+	blockMode.CryptBlocks(originalText,data)
+	//去尾部填充
+	originalText = utils.ClearPKCS5Padding(originalText, block.BlockSize())
+	return originalText, nil
 }
